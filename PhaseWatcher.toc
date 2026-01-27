@@ -1,17 +1,20 @@
-## Interface: 120000
-## Title: |cFF00BFFFPhase|r|cFFFFFFFFWatcher|r
-## Notes: Display current phase ID (Retail/Classic compatible)
-## Notes-zhCN: 显示当前位面ID (支持正式服/怀旧服)
-## Notes-zhTW: 顯示當前位面ID (支援正式服/懷舊服)
-## Author: David W Zhang
-## Version: 1.3.MultiLang
+## Interface: 110207
+## Title: Phase|cFFFFFFFFWatcher|r
+## Notes: Monitors and displays your current phase ID
+## Notes-zhCN: 监测并显示当前位面ID
+## Notes-zhTW: 監測並顯示當前位面ID
+## Author: YourName
+## Version: 2.0
 ## SavedVariables: PhaseWatcherDB
+## OptionalDeps: Ace3
 ## X-Category: Interface Enhancements
 ## X-Website: https://github.com/yourusername/PhaseWatcher
-## X-Curse-Project-ID: 
-## X-WoWI-ID: 
+## X-Curse-Project-ID: 0
+## X-WoWI-ID: 0
 
-# 加载顺序很重要！本地化文件必须最先加载
+# Localization
 Localization.lua
-PhaseWatcher.lua
-PhaseWatcher.xml
+
+# Core Modules
+Core.lua
+UI.lua

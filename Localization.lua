@@ -25,9 +25,7 @@ L["INSTANCE_LIMITATION"] = "In instance, may not detect due to 12.0 API limitati
 
 -- 设置面板
 L["SHOW_FRAME"] = "Show Phase Monitor Window"
-L["DISPLAY_FORMAT"] = "Display Format:"
-L["FORMAT_DECIMAL"] = "Decimal"
-L["FORMAT_HEXADECIMAL"] = "Hexadecimal"
+L["USE_HEXADECIMAL"] = "Use Hexadecimal Format"
 L["UPDATE_INTERVAL"] = "Update Interval: %.1f sec"
 L["UPDATE_INTERVAL_LOW"] = "0.1 sec"
 L["UPDATE_INTERVAL_HIGH"] = "2.0 sec"
@@ -73,9 +71,7 @@ if locale == "zhCN" then
     
     -- 设置面板
     L["SHOW_FRAME"] = "显示位面监测窗口"
-    L["DISPLAY_FORMAT"] = "显示格式:"
-    L["FORMAT_DECIMAL"] = "10进制"
-    L["FORMAT_HEXADECIMAL"] = "16进制"
+    L["USE_HEXADECIMAL"] = "使用16进制显示"
     L["UPDATE_INTERVAL"] = "更新间隔: %.1f 秒"
     L["UPDATE_INTERVAL_LOW"] = "0.1秒"
     L["UPDATE_INTERVAL_HIGH"] = "2.0秒"
@@ -122,9 +118,7 @@ if locale == "zhTW" then
     
     -- 设置面板
     L["SHOW_FRAME"] = "顯示位面監測視窗"
-    L["DISPLAY_FORMAT"] = "顯示格式:"
-    L["FORMAT_DECIMAL"] = "10進制"
-    L["FORMAT_HEXADECIMAL"] = "16進制"
+    L["USE_HEXADECIMAL"] = "使用16進制顯示"
     L["UPDATE_INTERVAL"] = "更新間隔: %.1f 秒"
     L["UPDATE_INTERVAL_LOW"] = "0.1秒"
     L["UPDATE_INTERVAL_HIGH"] = "2.0秒"

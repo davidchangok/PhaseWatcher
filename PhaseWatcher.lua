@@ -1,6 +1,7 @@
 -----------------------------
 -- 配置 & 全局变量
 -----------------------------
+local AddonName, private = ...
 PhaseWatcher = PhaseWatcher or {}
 PhaseWatcherDB = PhaseWatcherDB or {} 
 
@@ -14,13 +15,14 @@ local DEFAULT_CONFIG = {
     frameY         = 0,
     autoUpdate     = true,
     updateInterval = 0.5,
-    displayFormat  = "Decimal",
+    useHex         = false, -- 替代 displayFormat
     menuEnabled    = true,
 }
 
 -- 缓存变量
 PhaseWatcher.cachedPhaseID = nil
 PhaseWatcher.lastUpdateTime = 0
+PhaseWatcher.timer = nil
 
 -----------------------------
 -- 工具函数
@@ -32,7 +34,27 @@ function PhaseWatcher:LoadConfig()
         end
     end
     
+    -- 迁移旧配置 (如果存在)
+    if PhaseWatcherDB.displayFormat then
+        PhaseWatcherDB.useHex = (PhaseWatcherDB.displayFormat == "Hexadecimal")
+        PhaseWatcherDB.displayFormat = nil
+    end
+    
     self.db = PhaseWatcherDB
+end
+
+-- 计时器管理
+function PhaseWatcher:UpdateTimer()
+    if self.timer then
+        self.timer:Cancel()
+        self.timer = nil
+    end
+    
+    if self.db.autoUpdate then
+        self.timer = C_Timer.NewTicker(self.db.updateInterval, function()
+            self:UpdatePhaseDisplay()
+        end)
+    end
 end
 
 -- 核心:从 GUID 解析位面/分片 ID
@@ -143,7 +165,7 @@ function PhaseWatcher:UpdatePhaseDisplay()
 
     if self.cachedPhaseID then
         local formatStr
-        if self.db.displayFormat == "Hexadecimal" then
+        if self.db.useHex then
             formatStr = string.format("0x%X", self.cachedPhaseID)
         else
             formatStr = string.format("%d", self.cachedPhaseID)
@@ -185,45 +207,19 @@ local function CreateOptionsPanel()
         PhaseWatcher.MainFrame:SetShown(PhaseWatcher.db.showFrame)
     end)
 
-    -- 显示格式
-    local formatLabel = panel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    formatLabel:SetPoint("TOPLEFT", showFrameCheck, "BOTTOMLEFT", 0, -20)
-    formatLabel:SetText(L["DISPLAY_FORMAT"])
-
-    local formatDropdown = CreateFrame("Frame", "PhaseWatcherFormatDropdown", panel, "UIDropDownMenuTemplate")
-    formatDropdown:SetPoint("LEFT", formatLabel, "RIGHT", 0, -3)
-    
-    UIDropDownMenu_SetWidth(formatDropdown, 120)
-    UIDropDownMenu_Initialize(formatDropdown, function(self, level)
-        local info = UIDropDownMenu_CreateInfo()
-        
-        info.text = L["FORMAT_DECIMAL"]
-        info.value = "Decimal"
-        info.func = function()
-            PhaseWatcher.db.displayFormat = "Decimal"
-            UIDropDownMenu_SetText(formatDropdown, L["FORMAT_DECIMAL"])
-            PhaseWatcher:UpdatePhaseDisplay()
-        end
-        info.checked = (PhaseWatcher.db.displayFormat == "Decimal")
-        UIDropDownMenu_AddButton(info)
-        
-        info.text = L["FORMAT_HEXADECIMAL"]
-        info.value = "Hexadecimal"
-        info.func = function()
-            PhaseWatcher.db.displayFormat = "Hexadecimal"
-            UIDropDownMenu_SetText(formatDropdown, L["FORMAT_HEXADECIMAL"])
-            PhaseWatcher:UpdatePhaseDisplay()
-        end
-        info.checked = (PhaseWatcher.db.displayFormat == "Hexadecimal")
-        UIDropDownMenu_AddButton(info)
+    -- 16进制显示复选框 (替代 Dropdown)
+    local hexCheck = CreateFrame("CheckButton", "PhaseWatcherHexCheck", panel, "InterfaceOptionsCheckButtonTemplate")
+    hexCheck:SetPoint("TOPLEFT", showFrameCheck, "BOTTOMLEFT", 0, -10)
+    hexCheck.Text:SetText(L["USE_HEXADECIMAL"])
+    hexCheck:SetChecked(PhaseWatcher.db.useHex)
+    hexCheck:SetScript("OnClick", function(self)
+        PhaseWatcher.db.useHex = self:GetChecked()
+        PhaseWatcher:UpdatePhaseDisplay()
     end)
-    
-    UIDropDownMenu_SetText(formatDropdown, 
-        PhaseWatcher.db.displayFormat == "Hexadecimal" and L["FORMAT_HEXADECIMAL"] or L["FORMAT_DECIMAL"])
 
     -- 更新间隔滑块
     local intervalSlider = CreateFrame("Slider", "PhaseWatcherIntervalSlider", panel, "OptionsSliderTemplate")
-    intervalSlider:SetPoint("TOPLEFT", formatLabel, "BOTTOMLEFT", 0, -40)
+    intervalSlider:SetPoint("TOPLEFT", hexCheck, "BOTTOMLEFT", 0, -30)
     intervalSlider:SetMinMaxValues(0.1, 2.0)
     intervalSlider:SetValue(PhaseWatcher.db.updateInterval)
     intervalSlider:SetValueStep(0.1)
@@ -240,6 +236,8 @@ local function CreateOptionsPanel()
         PhaseWatcher.db.updateInterval = value
         local sliderName = self:GetName()
         _G[sliderName .. 'Text']:SetText(string.format(L["UPDATE_INTERVAL"], value))
+        -- 实时更新计时器
+        PhaseWatcher:UpdateTimer()
     end)
 
     -- 重置窗口位置按钮
@@ -331,12 +329,8 @@ function PhaseWatcher_OnLoad(self)
         PhaseWatcher:UpdatePhaseDisplay()
     end)
 
-    -- 使用更安全的定时器创建方式
-    if C_Timer and C_Timer.NewTicker then
-        C_Timer.NewTicker(PhaseWatcher.db.updateInterval, function()
-            PhaseWatcher:UpdatePhaseDisplay()
-        end)
-    end
+    -- 启动计时器
+    PhaseWatcher:UpdateTimer()
     
     self:ClearAllPoints()
     self:SetPoint("CENTER", UIParent, "CENTER", PhaseWatcher.db.frameX, PhaseWatcher.db.frameY)
@@ -403,11 +397,11 @@ SlashCmdList["PHASEWATCHER"] = function(msg)
         PhaseWatcher:UpdatePhaseDisplay()
         print("|cFF00BFFFPhaseWatcher:|r " .. L["CACHE_CLEARED"])
     elseif msg == "hex" then
-        PhaseWatcher.db.displayFormat = "Hexadecimal"
+        PhaseWatcher.db.useHex = true
         PhaseWatcher:UpdatePhaseDisplay()
         print("|cFF00BFFFPhaseWatcher:|r " .. L["FORMAT_SWITCHED_HEX"])
     elseif msg == "dec" then
-        PhaseWatcher.db.displayFormat = "Decimal"
+        PhaseWatcher.db.useHex = false
         PhaseWatcher:UpdatePhaseDisplay()
         print("|cFF00BFFFPhaseWatcher:|r " .. L["FORMAT_SWITCHED_DEC"])
     else

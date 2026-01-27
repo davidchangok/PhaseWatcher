@@ -1,0 +1,46 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Frame name="PhaseWatcherMainFrame" parent="UIParent" movable="true" enableMouse="true" hidden="false" inherits="BackdropTemplate">
+        <Size x="200" y="60" />
+        <Anchors>
+            <Anchor point="CENTER" />
+        </Anchors>
+        
+        <KeyValues>
+            <KeyValue key="backdropInfo" value="PhaseWatcher_Backdrop" type="global" />
+        </KeyValues>
+
+        <Layers>
+            <Layer level="ARTWORK">
+                <!-- 标题文本 - 将由 Lua 设置本地化内容 -->
+                <FontString name="$parentTitle" inherits="GameFontNormal" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="TOP" x="0" y="-8"/>
+                    </Anchors>
+                </FontString>
+                <!-- 位面ID文本 - 将由 Lua 设置本地化内容 -->
+                <FontString name="$parentPhaseText" inherits="GameFontHighlightLarge" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="CENTER" x="0" y="-5"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+
+        <Scripts>
+            <!-- 关键：Lua文件必须先加载，这里才能调用 -->
+            <OnLoad>
+                if PhaseWatcher_OnLoad then
+                    PhaseWatcher_OnLoad(self);
+                else
+                    message("Error: PhaseWatcher.lua not loaded!");
+                end
+            </OnLoad>
+            <OnDragStart>
+                PhaseWatcher_OnDragStart(self);
+            </OnDragStart>
+            <OnDragStop>
+                PhaseWatcher_OnDragStop(self);
+            </OnDragStop>
+        </Scripts>
+    </Frame>
+</Ui>

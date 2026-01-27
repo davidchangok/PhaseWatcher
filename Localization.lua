@@ -15,7 +15,7 @@ local locale = GetLocale()
 -----------------------------
 L["ADDON_LOADED"] = "loaded - Type %s to open settings"
 L["ADDON_NAME"] = "Phase|cFFFFFFFFWatcher|r"
-L["VERSION"] = "Version 2.0 - Updated for 11.2+ API"
+L["VERSION"] = "Version 2.0 - Updated for 12+ API"
 
 -- UI 文本
 L["PHASE_MONITORING"] = "Phase Monitor"
@@ -28,7 +28,7 @@ L["DETECTING"] = "Detecting..."
 L["DRAG_TO_MOVE"] = "Drag to move"
 
 -- 设置面板
-L["SETTINGS_TITLE"] = "PhaseWatcher Settings"
+L["SETTINGS_TITLE"] = "Addon Settings"
 L["SHOW_FRAME"] = "Show Phase Monitor Window"
 L["USE_HEXADECIMAL"] = "Use Hexadecimal Format"
 L["UPDATE_INTERVAL"] = "Update Interval: %.1f sec"
@@ -39,6 +39,21 @@ L["CLEAR_CACHE"] = "Clear Cached ID"
 L["LOCK_WINDOW"] = "Lock Window Position"
 L["SHOW_TOOLTIP"] = "Show Detailed Tooltip"
 L["AUTO_HIDE"] = "Auto Hide in Combat"
+L["GENERAL_SETTINGS"] = "General Settings"
+L["APPEARANCE_TITLE"] = "Appearance Settings"
+L["FONT_FACE"] = "Font"
+L["FONT_SIZE"] = "Font Size: %d"
+L["WINDOW_STYLE"] = "Window Style"
+L["WINDOW_ALPHA"] = "Transparency: %.1f"
+L["STYLE_STANDARD"] = "Blizzard Dialog"
+L["STYLE_TOOLTIP"] = "Blizzard Tooltip"
+L["STYLE_FLAT"] = "Flat"
+L["STYLE_NONE"] = "No Background"
+L["FONT_SYSTEM"] = "System Default"
+L["FONT_CHAT"] = "Chat Font"
+L["FONT_DAMAGE"] = "Combat Text Font"
+L["BACKGROUND_COLOR"] = "Background Color"
+L["BORDER_COLOR"] = "Border Color"
 
 -- 命令说明
 L["COMMANDS_TITLE"] = "Commands:"
@@ -73,17 +88,15 @@ L["ERROR_NO_UNIT"] = "No valid unit target found"
 
 -- 工具提示
 L["TOOLTIP_PHASE_ID"] = "Current Phase ID"
-L["TOOLTIP_FORMAT"] = "Format: %s"
+L["TOOLTIP_FORMAT"] = "Format:"
 L["TOOLTIP_DECIMAL"] = "Decimal"
 L["TOOLTIP_HEXADECIMAL"] = "Hexadecimal"
-L["TOOLTIP_SOURCE"] = "Source: %s"
+L["TOOLTIP_SOURCE"] = "Source:"
 L["TOOLTIP_SOURCE_PLAYER"] = "Player"
 L["TOOLTIP_SOURCE_TARGET"] = "Target"
 L["TOOLTIP_SOURCE_MOUSEOVER"] = "Mouseover"
 L["TOOLTIP_SOURCE_CACHED"] = "Cached"
-L["TOOLTIP_CLICK_TO_COPY"] = "Click to copy to clipboard"
 L["TOOLTIP_RIGHT_CLICK"] = "Right-click for options"
-L["COPIED_TO_CLIPBOARD"] = "Phase ID copied to clipboard: %s"
 
 -----------------------------
 -- 简体中文 (zhCN)
@@ -91,7 +104,7 @@ L["COPIED_TO_CLIPBOARD"] = "Phase ID copied to clipboard: %s"
 if locale == "zhCN" then
     L["ADDON_LOADED"] = "已加载 - 输入 %s 打开设置"
     L["ADDON_NAME"] = "位面|cFFFFFFFF监测|r"
-    L["VERSION"] = "版本 2.0 - 已更新支持11.2+ API"
+    L["VERSION"] = "版本 2.0 - 已更新支持12+ API"
     
     -- UI 文本
     L["PHASE_MONITORING"] = "位面监测"
@@ -104,7 +117,7 @@ if locale == "zhCN" then
     L["DRAG_TO_MOVE"] = "拖动移动"
     
     -- 设置面板
-    L["SETTINGS_TITLE"] = "PhaseWatcher 设置"
+    L["SETTINGS_TITLE"] = "插件设置"
     L["SHOW_FRAME"] = "显示位面监测窗口"
     L["USE_HEXADECIMAL"] = "使用16进制显示"
     L["UPDATE_INTERVAL"] = "更新间隔: %.1f 秒"
@@ -115,6 +128,21 @@ if locale == "zhCN" then
     L["LOCK_WINDOW"] = "锁定窗口位置"
     L["SHOW_TOOLTIP"] = "显示详细提示"
     L["AUTO_HIDE"] = "战斗中自动隐藏"
+    L["GENERAL_SETTINGS"] = "常规设置"
+    L["APPEARANCE_TITLE"] = "外观设置"
+    L["FONT_FACE"] = "字体"
+    L["FONT_SIZE"] = "字体大小: %d"
+    L["WINDOW_STYLE"] = "窗口风格"
+    L["WINDOW_ALPHA"] = "透明度: %.1f"
+    L["STYLE_STANDARD"] = "暴雪对话框"
+    L["STYLE_TOOLTIP"] = "暴雪提示框"
+    L["STYLE_FLAT"] = "扁平"
+    L["STYLE_NONE"] = "无背景"
+    L["FONT_SYSTEM"] = "系统默认"
+    L["FONT_CHAT"] = "聊天字体"
+    L["FONT_DAMAGE"] = "战斗文字"
+L["BACKGROUND_COLOR"] = "背景颜色"
+L["BORDER_COLOR"] = "边框颜色"
     
     -- 命令说明
     L["COMMANDS_TITLE"] = "命令说明:"
@@ -149,17 +177,15 @@ if locale == "zhCN" then
     
     -- 工具提示
     L["TOOLTIP_PHASE_ID"] = "当前位面ID"
-    L["TOOLTIP_FORMAT"] = "格式: %s"
+    L["TOOLTIP_FORMAT"] = "格式:"
     L["TOOLTIP_DECIMAL"] = "十进制"
     L["TOOLTIP_HEXADECIMAL"] = "十六进制"
-    L["TOOLTIP_SOURCE"] = "来源: %s"
+    L["TOOLTIP_SOURCE"] = "来源:"
     L["TOOLTIP_SOURCE_PLAYER"] = "玩家"
     L["TOOLTIP_SOURCE_TARGET"] = "目标"
     L["TOOLTIP_SOURCE_MOUSEOVER"] = "鼠标指向"
     L["TOOLTIP_SOURCE_CACHED"] = "缓存"
-    L["TOOLTIP_CLICK_TO_COPY"] = "点击复制到剪贴板"
     L["TOOLTIP_RIGHT_CLICK"] = "右键点击打开选项"
-    L["COPIED_TO_CLIPBOARD"] = "位面ID已复制到剪贴板: %s"
 end
 
 -----------------------------
@@ -168,7 +194,7 @@ end
 if locale == "zhTW" then
     L["ADDON_LOADED"] = "已載入 - 輸入 %s 開啟設定"
     L["ADDON_NAME"] = "位面|cFFFFFFFF監測|r"
-    L["VERSION"] = "版本 2.0 - 已更新支援11.2+ API"
+    L["VERSION"] = "版本 2.0 - 已更新支援12+ API"
     
     -- UI 文本
     L["PHASE_MONITORING"] = "位面監測"
@@ -181,7 +207,7 @@ if locale == "zhTW" then
     L["DRAG_TO_MOVE"] = "拖動移動"
     
     -- 设置面板
-    L["SETTINGS_TITLE"] = "PhaseWatcher 設定"
+    L["SETTINGS_TITLE"] = "插件設定"
     L["SHOW_FRAME"] = "顯示位面監測視窗"
     L["USE_HEXADECIMAL"] = "使用16進制顯示"
     L["UPDATE_INTERVAL"] = "更新間隔: %.1f 秒"
@@ -192,6 +218,21 @@ if locale == "zhTW" then
     L["LOCK_WINDOW"] = "鎖定視窗位置"
     L["SHOW_TOOLTIP"] = "顯示詳細提示"
     L["AUTO_HIDE"] = "戰鬥中自動隱藏"
+    L["GENERAL_SETTINGS"] = "一般設定"
+    L["APPEARANCE_TITLE"] = "外觀設定"
+    L["FONT_FACE"] = "字型"
+    L["FONT_SIZE"] = "字型大小: %d"
+    L["WINDOW_STYLE"] = "視窗風格"
+    L["WINDOW_ALPHA"] = "透明度: %.1f"
+    L["STYLE_STANDARD"] = "暴雪對話框"
+    L["STYLE_TOOLTIP"] = "暴雪提示框"
+    L["STYLE_FLAT"] = "扁平"
+    L["STYLE_NONE"] = "無背景"
+    L["FONT_SYSTEM"] = "系統預設"
+    L["FONT_CHAT"] = "聊天字型"
+    L["FONT_DAMAGE"] = "戰鬥文字"
+L["BACKGROUND_COLOR"] = "背景顏色"
+L["BORDER_COLOR"] = "邊框顏色"
     
     -- 命令说明
     L["COMMANDS_TITLE"] = "指令說明:"
@@ -226,17 +267,15 @@ if locale == "zhTW" then
     
     -- 工具提示
     L["TOOLTIP_PHASE_ID"] = "目前位面ID"
-    L["TOOLTIP_FORMAT"] = "格式: %s"
+    L["TOOLTIP_FORMAT"] = "格式:"
     L["TOOLTIP_DECIMAL"] = "十進制"
     L["TOOLTIP_HEXADECIMAL"] = "十六進制"
-    L["TOOLTIP_SOURCE"] = "來源: %s"
+    L["TOOLTIP_SOURCE"] = "來源:"
     L["TOOLTIP_SOURCE_PLAYER"] = "玩家"
     L["TOOLTIP_SOURCE_TARGET"] = "目標"
     L["TOOLTIP_SOURCE_MOUSEOVER"] = "滑鼠指向"
     L["TOOLTIP_SOURCE_CACHED"] = "快取"
-    L["TOOLTIP_CLICK_TO_COPY"] = "點擊複製到剪貼簿"
     L["TOOLTIP_RIGHT_CLICK"] = "右鍵點擊開啟選項"
-    L["COPIED_TO_CLIPBOARD"] = "位面ID已複製到剪貼簿: %s"
 end
 
 -----------------------------

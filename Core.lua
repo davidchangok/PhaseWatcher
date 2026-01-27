@@ -29,6 +29,14 @@ local defaults = {
         showTooltip = true,
         autoHideInCombat = false,
         
+        -- 外观设置
+        fontFace = STANDARD_TEXT_FONT,
+        fontSize = 16,
+        windowStyle = "Standard",
+        windowAlpha = 1.0,
+        backgroundColor = {r = 0, g = 0, b = 0, a = 0.85},
+        borderColor = {r = 0.4, g = 0.4, b = 0.4, a = 1},
+        
         -- 更新设置
         updateInterval = 0.5,
         
@@ -99,50 +107,56 @@ PW.FormatPhaseID = FormatPhaseID
 -- GUID格式: Player-[server]-[player_id]-[phase_id] 或类似
 -- 注意: 在某些情况下可能返回secret值
 local function ExtractPhaseFromGUID(guid)
-    if not guid or guid == "" then
-        return nil, "NO_GUID"
-    end
-    
-    if type(guid) ~= "string" then
-        return nil, "INVALID_TYPE"
-    end
-    
-    -- 检查是否为secret值 (通常是"0000000000000000"这样的占位符)
-    if string.match(guid, "^0+$") or guid == "" then
-        return nil, "SECRET_VALUE"
-    end
-    
-    -- 尝试解析GUID
-    -- WoW GUID格式示例: Player-[ServerID]-[CharacterID]
-    -- Creature/Vehicle等: Creature-0-[ServerID]-[MapID]-[SpawnID]-[CreatureID]-[GUID]
-    
-    -- 使用 pcall 保护 strsplit，防止特殊 GUID 导致的错误
-    local success, guidType, zero, serverID, instanceID, zoneUID = pcall(strsplit, "-", guid)
-    
-    if not success or not guidType then
-        return nil, "INVALID_GUID"
-    end
-    
-    -- 对于玩家GUID
-    if guidType == "Player" or guidType == "Pet" then
-        return nil, "PLAYER_GUID"
-    end
-    
-    -- 对于NPC/生物GUID
-    if guidType == "Creature" or guidType == "Vehicle" or guidType == "GameObject" then
-        -- 注意: instanceID (第4位) 通常是 MapID，是静态的
-        -- zoneUID (第5位) 在某些情况下可能包含分片信息
-        -- 修正: GUID 字符串中间的部分通常是十进制显示的，只有最后一部分是十六进制
-        if zoneUID and zoneUID ~= "" and zoneUID ~= "0" then
-            -- 使用十进制解析 (移除 16 参数)
-            local phaseID = tonumber(zoneUID)
-            if phaseID and phaseID > 0 and phaseID < 999999 then
-                return phaseID, "GUID_PARSE"
+    -- 全局 pcall 保护：任何对 guid 的操作（包括比较、类型检查等）都在保护范围内
+    -- 这是为了防止 Secret Value (userdata) 在任何看似无害的操作中触发错误
+    -- 即使是 guid == "" 这样的比较，如果 guid 是 Secret Value 也会导致崩溃
+    local success, phaseID = pcall(function()
+        if not guid then return nil end
+        
+        -- 必须先检查类型。Secret Value 是 userdata。
+        -- 虽然 type() 通常是安全的，但为了"最严格"的标准，我们在 pcall 内部处理
+        if type(guid) ~= "string" then
+            return nil
+        end
+        
+        if guid == "" then return nil end
+        
+        local guidType, zero, serverID, instanceID, zoneUID = strsplit("-", guid)
+        
+        if not guidType then return nil end
+        
+        -- Player/Pet GUIDs don't contain phase info in the expected format
+        if guidType == "Player" or guidType == "Pet" then
+            return nil
+        end
+        
+        -- NPC/Vehicle/GameObject GUIDs
+        if guidType == "Creature" or guidType == "Vehicle" or guidType == "GameObject" then
+            if zoneUID and zoneUID ~= "" and zoneUID ~= "0" then
+                local id = tonumber(zoneUID)
+                if id and id > 0 and id < 999999 then
+                    return id
+                end
             end
         end
-    end
+        return nil
+    end)
     
-    return nil, "NO_PHASE_IN_GUID"
+    if success and phaseID then
+        return phaseID, "GUID_PARSE"
+    else
+        -- 如果 pcall 失败（捕获到错误），或者 pcall 成功但返回 nil
+        -- 我们进一步检查是否是因为 Secret Value
+        if not success or type(guid) == "userdata" then
+            return nil, "SECRET_VALUE"
+        end
+        
+        if not guid or guid == "" then
+             return nil, "NO_GUID"
+        end
+        
+        return nil, "NO_PHASE_IN_GUID"
+    end
 end
 PW.ExtractPhaseFromGUID = ExtractPhaseFromGUID
 

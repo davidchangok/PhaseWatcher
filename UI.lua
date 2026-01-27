@@ -28,6 +28,7 @@ local function CreateMainFrame()
     frame:SetFrameLevel(10)
     frame:EnableMouse(true)
     frame:SetMovable(true)
+    frame:RegisterForDrag("LeftButton")
     frame:SetClampedToScreen(true)
     
     -- 背景
@@ -42,20 +43,13 @@ local function CreateMainFrame()
     frame:SetBackdropColor(0, 0, 0, 0.85)
     frame:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
     
-    -- 标题文本
-    local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    title:SetPoint("TOP", frame, "TOP", 0, -8)
-    title:SetText(L["PHASE_MONITORING"] or "Phase Monitor")
-    title:SetTextColor(0.8, 0.8, 1, 1)
-    PW.titleText = title
-    
     -- 位面ID显示文本
     local phaseText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
-    phaseText:SetPoint("CENTER", frame, "CENTER", 0, -2)
+    -- phaseText:SetPoint("TOP", title, "BOTTOM", 0, -4)
+    phaseText:SetPoint("CENTER", frame, "CENTER", 0, 0)
     phaseText:SetText(L["INITIALIZING"] or "Initializing...")
     phaseText:SetTextColor(0, 1, 0.5, 1)
     phaseText:SetJustifyH("CENTER")
-    phaseText:SetWidth(200)
     PW.phaseText = phaseText
     
     -- 拖动提示文本
@@ -84,35 +78,104 @@ local function CreateMainFrame()
     end)
     
     -- 拖动功能
-    frame:SetScript("OnMouseDown", function(self, button)
-        if button == "LeftButton" and not PW.db.profile.isLocked then
-            self:StartMoving()
-        elseif button == "RightButton" then
+    frame:SetScript("OnMouseDown", function(self, button) 
+        if button == "RightButton" then
             PW:ShowContextMenu(self)
         end
     end)
-    
-    frame:SetScript("OnMouseUp", function(self, button)
+
+    frame:SetScript("OnDragStart", function(self, button)
         if button == "LeftButton" then
-            self:StopMovingOrSizing()
-            PW:SavePosition()
-        end
-    end)
-    
-    -- 点击复制到剪贴板
-    phaseText:SetScript("OnMouseDown", function(self, button)
-        if button == "LeftButton" and PW.currentPhaseID then
-            local formattedID = PW.FormatPhaseID(PW.currentPhaseID, PW.db.profile.useHexadecimal)
-            -- 尝试复制到剪贴板
-            if C_ChatInfo and C_ChatInfo.CopyToClipboard then
-                C_ChatInfo.CopyToClipboard(formattedID)
-                PW.Print(L["COPIED_TO_CLIPBOARD"] or "Phase ID copied to clipboard: %s", formattedID)
+            if not PW.db.profile.isLocked then
+                self:StartMoving()
             end
         end
     end)
-    
+
+    frame:SetScript("OnDragStop", function(self)
+        self:StopMovingOrSizing()
+        PW:SavePosition()
+    end)
+
     PW.mainFrame = frame
     return frame
+end
+
+-----------------------------
+-- 自动调整窗口大小
+-----------------------------
+
+function PW:ResizeFrameToContent()    
+    if not self.mainFrame or not self.phaseText then return end
+    
+    local phaseWidth = self.phaseText:GetStringWidth() or 0
+    local phaseHeight = self.phaseText:GetStringHeight() or 0
+    
+    local paddingX = 30
+    local paddingY = 20 -- 10(Top) + 10(Bottom)
+    
+    local width = phaseWidth + paddingX
+    local height = phaseHeight + paddingY
+    
+    self.mainFrame:SetSize(math.max(width, 140), math.max(height, 50))
+end
+
+-----------------------------
+-- 外观更新函数
+-----------------------------
+
+function PW:UpdateAppearance()
+    if not self.mainFrame then return end
+
+    -- 应用透明度
+    self.mainFrame:SetAlpha(self.db.profile.windowAlpha or 1.0)
+
+    -- 应用字体
+    local fontPath = self.db.profile.fontFace or STANDARD_TEXT_FONT
+    local fontSize = self.db.profile.fontSize or 16
+    
+    if self.phaseText then
+        self.phaseText:SetFont(fontPath, fontSize, "OUTLINE")
+    end
+    
+    -- 应用窗口风格
+    local style = self.db.profile.windowStyle or "Standard"
+    local bg = self.db.profile.backgroundColor or {r = 0, g = 0, b = 0, a = 0.85}
+    local border = self.db.profile.borderColor or {r = 0.4, g = 0.4, b = 0.4, a = 1}
+    
+    if style == "None" then
+        self.mainFrame:SetBackdrop(nil)
+    elseif style == "Tooltip" then
+        self.mainFrame:SetBackdrop({
+            bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+            edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+            tile = true, tileSize = 16, edgeSize = 16,
+            insets = { left = 4, right = 4, top = 4, bottom = 4 }
+        })
+        self.mainFrame:SetBackdropColor(bg.r, bg.g, bg.b, bg.a)
+        self.mainFrame:SetBackdropBorderColor(border.r, border.g, border.b, border.a)
+    elseif style == "Flat" then
+        self.mainFrame:SetBackdrop({
+            bgFile = "Interface\\Buttons\\WHITE8X8",
+            edgeFile = "Interface\\Buttons\\WHITE8X8",
+            tile = false, edgeSize = 1,
+            insets = { left = 0, right = 0, top = 0, bottom = 0 }
+        })
+        self.mainFrame:SetBackdropColor(bg.r, bg.g, bg.b, bg.a)
+        self.mainFrame:SetBackdropBorderColor(border.r, border.g, border.b, border.a)
+    else -- Standard
+        self.mainFrame:SetBackdrop({
+            bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+            tile = true, tileSize = 32, edgeSize = 16,
+            insets = { left = 4, right = 4, top = 4, bottom = 4 }
+        })
+        self.mainFrame:SetBackdropColor(bg.r, bg.g, bg.b, bg.a)
+        self.mainFrame:SetBackdropBorderColor(border.r, border.g, border.b, border.a)
+    end
+    
+    -- 调整大小以适应新字体
+    self:ResizeFrameToContent()
 end
 
 -----------------------------
@@ -160,6 +223,9 @@ function PW:UpdateUI()
     
     self.phaseText:SetText(displayText)
     self.phaseText:SetTextColor(r, g, b, 1)
+    
+    -- 调整大小以适应新文本
+    self:ResizeFrameToContent()
 end
 
 function PW:UpdateFrameVisibility()
@@ -266,7 +332,6 @@ function PW:ShowTooltip(frame)
     end
     
     GameTooltip:AddLine(" ")
-    GameTooltip:AddLine(L["TOOLTIP_CLICK_TO_COPY"] or "Click to copy to clipboard", 0.5, 0.5, 0.5)
     GameTooltip:AddLine(L["TOOLTIP_RIGHT_CLICK"] or "Right-click for options", 0.5, 0.5, 0.5)
     
     GameTooltip:Show()
@@ -310,7 +375,7 @@ function PW:ShowContextMenu(owner)
         -- 按钮
         root:CreateButton(L["CLEAR_CACHE"] or "Clear Cached ID", function() self:ClearCache() end)
         root:CreateButton(L["RESET_POSITION"] or "Reset Window Position", function() self:ResetPosition() end)
-        root:CreateButton(L["CMD_CONFIG"] or "Open Settings", function() self:OpenConfig() end)
+        root:CreateButton(L["SETTINGS_TITLE"] or "PhaseWatcher Settings", function() self:OpenConfig() end)
     end)
 end
 
@@ -318,9 +383,47 @@ end
 -- 设置面板 (Interface Options)
 -----------------------------
 
+-- 创建分组框辅助函数
+local function CreateGroupBox(parent, title)
+    local frame = CreateFrame("Frame", nil, parent, "BackdropTemplate")
+    frame:SetBackdrop({
+        edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        edgeSize = 16,
+    })
+    frame:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
+    
+    local label = frame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    label:SetPoint("TOPLEFT", 16, 10)
+    label:SetText(title)
+    
+    return frame
+end
+
+-- 颜色选择器辅助函数
+local function ShowColorPicker(r, g, b, a, callback)
+    local info = {
+        r = r, g = g, b = b, opacity = a,
+        hasOpacity = true,
+        swatchFunc = function()
+            local nr, ng, nb = ColorPickerFrame:GetColorRGB()
+            local na = ColorPickerFrame:GetColorAlpha()
+            callback(nr, ng, nb, na)
+        end,
+        opacityFunc = function()
+            local nr, ng, nb = ColorPickerFrame:GetColorRGB()
+            local na = ColorPickerFrame:GetColorAlpha()
+            callback(nr, ng, nb, na)
+        end,
+        cancelFunc = function()
+            callback(r, g, b, a)
+        end,
+    }
+    ColorPickerFrame:SetupColorPickerAndShow(info)
+end
+
 local function CreateSettingsPanel()
     local panel = CreateFrame("Frame", "PhaseWatcherSettingsPanel", UIParent)
-    panel.name = "PhaseWatcher"
+    panel.name = "|cffff8000Phase|rWatcher"
     
     -- 标题
     local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
@@ -333,9 +436,28 @@ local function CreateSettingsPanel()
     version:SetText(L["VERSION"] or "Version 2.0")
     version:SetTextColor(0.7, 0.7, 0.7, 1)
     
+    -- 创建滚动框架
+    local scrollFrame = CreateFrame("ScrollFrame", nil, panel, "UIPanelScrollFrameTemplate")
+    scrollFrame:SetPoint("TOPLEFT", 10, -60)
+    scrollFrame:SetPoint("BOTTOMRIGHT", -30, 10)
+    
+    -- 创建内容框架
+    local content = CreateFrame("Frame", nil, scrollFrame)
+    content:SetSize(600, 750)
+    scrollFrame:SetScrollChild(content)
+    
+    -----------------------------
+    -- 分组 1: 常规设置
+    -----------------------------
+    
+    local groupGeneral = CreateGroupBox(content, L["GENERAL_SETTINGS"] or "General Settings")
+    groupGeneral:SetPoint("TOPLEFT", 10, -30)
+    groupGeneral:SetPoint("RIGHT", -10, 0)
+    groupGeneral:SetHeight(320)
+    
     -- 显示窗口复选框
-    local showFrameCheck = CreateFrame("CheckButton", nil, panel, "InterfaceOptionsCheckButtonTemplate")
-    showFrameCheck:SetPoint("TOPLEFT", version, "BOTTOMLEFT", 0, -20)
+    local showFrameCheck = CreateFrame("CheckButton", nil, groupGeneral, "InterfaceOptionsCheckButtonTemplate")
+    showFrameCheck:SetPoint("TOPLEFT", 16, -30)
     showFrameCheck.Text:SetText(L["SHOW_FRAME"] or "Show Phase Monitor Window")
     showFrameCheck:SetChecked(PW.db.profile.showFrame)
     showFrameCheck:SetScript("OnClick", function(self)
@@ -344,7 +466,7 @@ local function CreateSettingsPanel()
     end)
     
     -- 十六进制复选框
-    local hexCheck = CreateFrame("CheckButton", nil, panel, "InterfaceOptionsCheckButtonTemplate")
+    local hexCheck = CreateFrame("CheckButton", nil, groupGeneral, "InterfaceOptionsCheckButtonTemplate")
     hexCheck:SetPoint("TOPLEFT", showFrameCheck, "BOTTOMLEFT", 0, -8)
     hexCheck.Text:SetText(L["USE_HEXADECIMAL"] or "Use Hexadecimal Format")
     hexCheck:SetChecked(PW.db.profile.useHexadecimal)
@@ -353,7 +475,7 @@ local function CreateSettingsPanel()
     end)
     
     -- 锁定窗口复选框
-    local lockCheck = CreateFrame("CheckButton", nil, panel, "InterfaceOptionsCheckButtonTemplate")
+    local lockCheck = CreateFrame("CheckButton", nil, groupGeneral, "InterfaceOptionsCheckButtonTemplate")
     lockCheck:SetPoint("TOPLEFT", hexCheck, "BOTTOMLEFT", 0, -8)
     lockCheck.Text:SetText(L["LOCK_WINDOW"] or "Lock Window Position")
     lockCheck:SetChecked(PW.db.profile.isLocked)
@@ -363,7 +485,7 @@ local function CreateSettingsPanel()
     end)
     
     -- 显示工具提示复选框
-    local tooltipCheck = CreateFrame("CheckButton", nil, panel, "InterfaceOptionsCheckButtonTemplate")
+    local tooltipCheck = CreateFrame("CheckButton", nil, groupGeneral, "InterfaceOptionsCheckButtonTemplate")
     tooltipCheck:SetPoint("TOPLEFT", lockCheck, "BOTTOMLEFT", 0, -8)
     tooltipCheck.Text:SetText(L["SHOW_TOOLTIP"] or "Show Detailed Tooltip")
     tooltipCheck:SetChecked(PW.db.profile.showTooltip)
@@ -372,7 +494,7 @@ local function CreateSettingsPanel()
     end)
     
     -- 战斗自动隐藏复选框
-    local autoHideCheck = CreateFrame("CheckButton", nil, panel, "InterfaceOptionsCheckButtonTemplate")
+    local autoHideCheck = CreateFrame("CheckButton", nil, groupGeneral, "InterfaceOptionsCheckButtonTemplate")
     autoHideCheck:SetPoint("TOPLEFT", tooltipCheck, "BOTTOMLEFT", 0, -8)
     autoHideCheck.Text:SetText(L["AUTO_HIDE"] or "Auto Hide in Combat")
     autoHideCheck:SetChecked(PW.db.profile.autoHideInCombat)
@@ -381,7 +503,7 @@ local function CreateSettingsPanel()
     end)
     
     -- 更新间隔滑块
-    local intervalSlider = CreateFrame("Slider", nil, panel, "OptionsSliderTemplate")
+    local intervalSlider = CreateFrame("Slider", nil, groupGeneral, "OptionsSliderTemplate")
     intervalSlider:SetPoint("TOPLEFT", autoHideCheck, "BOTTOMLEFT", 16, -32)
     intervalSlider:SetMinMaxValues(0.1, 2.0)
     intervalSlider:SetValue(PW.db.profile.updateInterval or 0.5)
@@ -410,7 +532,7 @@ local function CreateSettingsPanel()
     end)
     
     -- 重置位置按钮
-    local resetButton = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+    local resetButton = CreateFrame("Button", nil, groupGeneral, "UIPanelButtonTemplate")
     resetButton:SetPoint("TOPLEFT", intervalSlider, "BOTTOMLEFT", -16, -32)
     resetButton:SetSize(180, 22)
     resetButton:SetText(L["RESET_POSITION"] or "Reset Window Position")
@@ -419,20 +541,198 @@ local function CreateSettingsPanel()
     end)
     
     -- 清除缓存按钮
-    local clearButton = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
-    clearButton:SetPoint("TOPLEFT", resetButton, "BOTTOMLEFT", 0, -8)
+    local clearButton = CreateFrame("Button", nil, groupGeneral, "UIPanelButtonTemplate")
+    clearButton:SetPoint("LEFT", resetButton, "RIGHT", 10, 0)
     clearButton:SetSize(180, 22)
     clearButton:SetText(L["CLEAR_CACHE"] or "Clear Cached ID")
     clearButton:SetScript("OnClick", function()
         PW:ClearCache()
     end)
     
+    -----------------------------
+    -- 分组 2: 外观设置
+    -----------------------------
+    
+    local groupAppearance = CreateGroupBox(content, L["APPEARANCE_TITLE"] or "Appearance Settings")
+    groupAppearance:SetPoint("TOPLEFT", groupGeneral, "BOTTOMLEFT", 0, -30)
+    groupAppearance:SetPoint("RIGHT", -10, 0)
+    groupAppearance:SetHeight(250)
+
+    -- 字体大小滑块
+    local fontSizeSlider = CreateFrame("Slider", nil, groupAppearance, "OptionsSliderTemplate")
+    fontSizeSlider:SetPoint("TOPLEFT", 16, -40)
+    fontSizeSlider:SetMinMaxValues(10, 32)
+    fontSizeSlider:SetValue(PW.db.profile.fontSize or 16)
+    fontSizeSlider:SetValueStep(1)
+    fontSizeSlider:SetObeyStepOnDrag(true)
+    fontSizeSlider:SetWidth(200)
+    
+    local fontSizeLabel = fontSizeSlider:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    fontSizeLabel:SetPoint("BOTTOM", fontSizeSlider, "TOP", 0, 4)
+    fontSizeLabel:SetText(string.format(L["FONT_SIZE"] or "Font Size: %d", fontSizeSlider:GetValue()))
+    
+    fontSizeSlider.Low:SetText("10")
+    fontSizeSlider.High:SetText("32")
+    
+    fontSizeSlider:SetScript("OnValueChanged", function(self, value)
+        value = math.floor(value + 0.5)
+        fontSizeLabel:SetText(string.format(L["FONT_SIZE"] or "Font Size: %d", value))
+        PW.db.profile.fontSize = value
+        PW:UpdateAppearance()
+    end)
+
+    -- 透明度滑块
+    local alphaSlider = CreateFrame("Slider", nil, groupAppearance, "OptionsSliderTemplate")
+    alphaSlider:SetPoint("LEFT", fontSizeSlider, "RIGHT", 40, 0)
+    alphaSlider:SetMinMaxValues(0.1, 1.0)
+    alphaSlider:SetValue(PW.db.profile.windowAlpha or 1.0)
+    alphaSlider:SetValueStep(0.1)
+    alphaSlider:SetObeyStepOnDrag(true)
+    alphaSlider:SetWidth(200)
+    
+    local alphaLabel = alphaSlider:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    alphaLabel:SetPoint("BOTTOM", alphaSlider, "TOP", 0, 4)
+    alphaLabel:SetText(string.format(L["WINDOW_ALPHA"] or "Transparency: %.1f", alphaSlider:GetValue()))
+    
+    alphaSlider.Low:SetText("0.1")
+    alphaSlider.High:SetText("1.0")
+    
+    alphaSlider:SetScript("OnValueChanged", function(self, value)
+        value = math.floor(value * 10 + 0.5) / 10
+        alphaLabel:SetText(string.format(L["WINDOW_ALPHA"] or "Transparency: %.1f", value))
+        PW.db.profile.windowAlpha = value
+        PW:UpdateAppearance()
+    end)
+
+    -- 字体选择 (单选按钮组)
+    local fontLabel = groupAppearance:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    fontLabel:SetPoint("TOPLEFT", fontSizeSlider, "BOTTOMLEFT", -16, -24)
+    fontLabel:SetText(L["FONT_FACE"] or "Font")
+
+    local fonts = {
+        {name = L["FONT_SYSTEM"] or "System Default", path = STANDARD_TEXT_FONT},
+        {name = L["FONT_CHAT"] or "Chat Font", path = ChatFontNormal:GetFont()},
+        {name = L["FONT_DAMAGE"] or "Combat Text", path = DAMAGE_TEXT_FONT},
+    }
+
+    local fontRadioButtons = {}
+    for i, f in ipairs(fonts) do
+        local rb = CreateFrame("CheckButton", nil, groupAppearance, "UIRadioButtonTemplate")
+        if i == 1 then
+            rb:SetPoint("TOPLEFT", fontLabel, "BOTTOMLEFT", 0, -8)
+        else
+            rb:SetPoint("LEFT", fontRadioButtons[i-1].text, "RIGHT", 20, 0)
+        end
+        
+        rb.text = rb:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        rb.text:SetPoint("LEFT", rb, "RIGHT", 5, 1)
+        rb.text:SetText(f.name)
+        
+        rb:SetScript("OnClick", function(self)
+            PW.db.profile.fontFace = f.path
+            PW:UpdateAppearance()
+            for _, btn in ipairs(fontRadioButtons) do
+                btn:SetChecked(btn == self)
+            end
+        end)
+        
+        -- 初始化选中状态
+        -- 注意: 简单的字符串比较可能因为路径格式不同而失败，这里做简单处理
+        -- 实际应用中可能需要更严谨的路径比较
+        rb:SetChecked(PW.db.profile.fontFace == f.path)
+        
+        table.insert(fontRadioButtons, rb)
+    end
+
+    -- 窗口风格选择 (单选按钮组)
+    local styleLabel = groupAppearance:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    styleLabel:SetPoint("TOPLEFT", fontRadioButtons[1], "BOTTOMLEFT", 0, -16)
+    styleLabel:SetText(L["WINDOW_STYLE"] or "Window Style")
+
+    local styles = {
+        {name = L["STYLE_STANDARD"] or "Blizzard Dialog", value = "Standard"},
+        {name = L["STYLE_TOOLTIP"] or "Blizzard Tooltip", value = "Tooltip"},
+        {name = L["STYLE_FLAT"] or "Flat", value = "Flat"},
+        {name = L["STYLE_NONE"] or "None", value = "None"},
+    }
+
+    local styleRadioButtons = {}
+    for i, s in ipairs(styles) do
+        local rb = CreateFrame("CheckButton", nil, groupAppearance, "UIRadioButtonTemplate")
+        if i == 1 then
+            rb:SetPoint("TOPLEFT", styleLabel, "BOTTOMLEFT", 0, -8)
+        else
+            rb:SetPoint("LEFT", styleRadioButtons[i-1].text, "RIGHT", 20, 0)
+        end
+        
+        rb.text = rb:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+        rb.text:SetPoint("LEFT", rb, "RIGHT", 5, 1)
+        rb.text:SetText(s.name)
+        
+        rb:SetScript("OnClick", function(self)
+            PW.db.profile.windowStyle = s.value
+            PW:UpdateAppearance()
+            for _, btn in ipairs(styleRadioButtons) do
+                btn:SetChecked(btn == self)
+            end
+        end)
+        
+        rb:SetChecked(PW.db.profile.windowStyle == s.value)
+        table.insert(styleRadioButtons, rb)
+    end
+
+    -- 背景颜色按钮
+    local bgColorButton = CreateFrame("Button", nil, groupAppearance, "UIPanelButtonTemplate")
+    bgColorButton:SetPoint("TOPLEFT", styleRadioButtons[1], "BOTTOMLEFT", 0, -24)
+    bgColorButton:SetSize(180, 22)
+    bgColorButton:SetText(L["BACKGROUND_COLOR"] or "Background Color")
+    
+    local bgSwatch = bgColorButton:CreateTexture(nil, "OVERLAY")
+    bgSwatch:SetSize(16, 16)
+    bgSwatch:SetPoint("RIGHT", -4, 0)
+    local bgCol = PW.db.profile.backgroundColor
+    bgSwatch:SetColorTexture(bgCol.r, bgCol.g, bgCol.b, bgCol.a)
+    
+    bgColorButton:SetScript("OnClick", function()
+        local c = PW.db.profile.backgroundColor
+        ShowColorPicker(c.r, c.g, c.b, c.a, function(r, g, b, a)
+            PW.db.profile.backgroundColor = {r = r, g = g, b = b, a = a}
+            bgSwatch:SetColorTexture(r, g, b, a)
+            PW:UpdateAppearance()
+        end)
+    end)
+
+    -- 边框颜色按钮
+    local borderColorButton = CreateFrame("Button", nil, groupAppearance, "UIPanelButtonTemplate")
+    borderColorButton:SetPoint("LEFT", bgColorButton, "RIGHT", 60, 0)
+    borderColorButton:SetSize(180, 22)
+    borderColorButton:SetText(L["BORDER_COLOR"] or "Border Color")
+    
+    local borderSwatch = borderColorButton:CreateTexture(nil, "OVERLAY")
+    borderSwatch:SetSize(16, 16)
+    borderSwatch:SetPoint("RIGHT", -4, 0)
+    local borderCol = PW.db.profile.borderColor
+    borderSwatch:SetColorTexture(borderCol.r, borderCol.g, borderCol.b, borderCol.a)
+    
+    borderColorButton:SetScript("OnClick", function()
+        local c = PW.db.profile.borderColor
+        ShowColorPicker(c.r, c.g, c.b, c.a, function(r, g, b, a)
+            PW.db.profile.borderColor = {r = r, g = g, b = b, a = a}
+            borderSwatch:SetColorTexture(r, g, b, a)
+            PW:UpdateAppearance()
+        end)
+    end)
+
+    -----------------------------
+    -- 底部说明区域
+    -----------------------------
+    
     -- 命令说明
-    local commandsTitle = panel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    commandsTitle:SetPoint("TOPLEFT", clearButton, "BOTTOMLEFT", 0, -24)
+    local commandsTitle = content:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    commandsTitle:SetPoint("TOPLEFT", groupAppearance, "BOTTOMLEFT", 0, -30)
     commandsTitle:SetText(L["COMMANDS_TITLE"] or "Commands:")
     
-    local commandsText = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+    local commandsText = content:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     commandsText:SetPoint("TOPLEFT", commandsTitle, "BOTTOMLEFT", 8, -8)
     commandsText:SetJustifyH("LEFT")
     commandsText:SetWidth(500)
@@ -451,11 +751,11 @@ local function CreateSettingsPanel()
     commandsText:SetText(table.concat(commands, "\n"))
     
     -- 注意事项
-    local noteTitle = panel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+    local noteTitle = content:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     noteTitle:SetPoint("TOPLEFT", commandsText, "BOTTOMLEFT", -8, -16)
     noteTitle:SetText(L["NOTE_TITLE"] or "Note:")
     
-    local noteText = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+    local noteText = content:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     noteText:SetPoint("TOPLEFT", noteTitle, "BOTTOMLEFT", 8, -8)
     noteText:SetJustifyH("LEFT")
     noteText:SetWidth(500)
@@ -477,16 +777,12 @@ end
 
 function PW:OpenConfig()
     -- 11.0+ 新API
-    if Settings and Settings.OpenToCategory then
-        if self.settingsCategory then
-            Settings.OpenToCategory(self.settingsCategory)
-        else
-            Settings.OpenToCategory("PhaseWatcher")
-        end
+    if self.settingsCategory and Settings and Settings.OpenToCategory then
+        Settings.OpenToCategory(self.settingsCategory:GetID())
     -- 旧API
     elseif InterfaceOptionsFrame_OpenToCategory then
-        InterfaceOptionsFrame_OpenToCategory("PhaseWatcher")
-        InterfaceOptionsFrame_OpenToCategory("PhaseWatcher")  -- 调用两次确保打开
+        InterfaceOptionsFrame_OpenToCategory("|cffff8000Phase|rWatcher")
+        InterfaceOptionsFrame_OpenToCategory("|cffff8000Phase|rWatcher")  -- 调用两次确保打开
     end
 end
 
@@ -511,6 +807,9 @@ function PW:InitializeUI()
     
     -- 应用可见性
     self:UpdateFrameVisibility()
+    
+    -- 应用外观设置
+    self:UpdateAppearance()
     
     -- 初始UI更新
     self:UpdateUI()

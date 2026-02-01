@@ -1,13 +1,14 @@
 ## Interface: 120000
-## Title: |cffff8000Phase|rWatcher
+## Title: |TInterface\AddOns\PhaseWatcher\icon:16|t|cffff8000Phase|rWatcher
 ## Notes: Monitors and displays your current phase ID
 ## Notes-zhCN: 监测并显示当前位面ID
 ## Notes-zhTW: 監測並顯示當前位面ID
 ## Author: David W Zhang
-## Version: 2.0
+## Version: 2.0.0
 ## SavedVariables: PhaseWatcherDB
 ## X-Category: Interface Enhancements
 ## X-Website: https://www.curseforge.com/wow/addons/phasewatcher
+## X-Source-URL: https://github.com/davidchangok/PhaseWatcher
 ## X-Curse-Project-ID: 1426230
 
 # Localization

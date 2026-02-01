@@ -15,7 +15,7 @@ local locale = GetLocale()
 -----------------------------
 L["ADDON_LOADED"] = "loaded - Type %s to open settings"
 L["ADDON_NAME"] = "Phase|cFFFFFFFFWatcher|r"
-L["VERSION"] = "Version 2.0 - Updated for 12+ API"
+L["VERSION"] = "Version 2.0.0 - Updated for 12+ API"
 
 -- UI 文本
 L["PHASE_MONITORING"] = "Phase Monitor"
@@ -104,7 +104,7 @@ L["TOOLTIP_RIGHT_CLICK"] = "Right-click for options"
 if locale == "zhCN" then
     L["ADDON_LOADED"] = "已加载 - 输入 %s 打开设置"
     L["ADDON_NAME"] = "位面|cFFFFFFFF监测|r"
-    L["VERSION"] = "版本 2.0 - 已更新支持12+ API"
+    L["VERSION"] = "版本 2.0.0 - 已更新支持12+ API"
     
     -- UI 文本
     L["PHASE_MONITORING"] = "位面监测"
@@ -194,7 +194,7 @@ end
 if locale == "zhTW" then
     L["ADDON_LOADED"] = "已載入 - 輸入 %s 開啟設定"
     L["ADDON_NAME"] = "位面|cFFFFFFFF監測|r"
-    L["VERSION"] = "版本 2.0 - 已更新支援12+ API"
+    L["VERSION"] = "版本 2.0.0 - 已更新支援12+ API"
     
     -- UI 文本
     L["PHASE_MONITORING"] = "位面監測"

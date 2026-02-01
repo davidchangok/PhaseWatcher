@@ -1,8 +1,20 @@
-# PhaseWatcher v2.0
+# PhaseWatcher
 
-## English
+![Author](https://img.shields.io/badge/Author-David%20W%20Zhang-orange) ![Version](https://img.shields.io/badge/Version-v2.0.0-blue) [![GitHub](https://img.shields.io/badge/GitHub-Repo-181717?logo=github)](https://github.com/davidchangok/PhaseWatcher)
 
-### Major Update: Architecture Refactor & 12.0 API Support
+**PhaseWatcher** is a lightweight World of Warcraft addon designed to track and display Phase IDs, ZoneUIDs, and NPC GUID information. It provides essential phasing data to help players and developers verify if they are in the same shard or layer as their target.
+
+## 🌟 Features
+
+*   **Phase & GUID Tracking**: Real-time monitoring of NPC and Player Phase IDs.
+*   **Modern API Support**: Built for WoW 11.0 (The War Within) and 12.0+, utilizing `MenuUtil` and the native `Settings` API to eliminate taint.
+*   **Accurate Parsing**: Correctly interprets decimal ZoneUIDs and handles protected "Secret Values" in instances.
+*   **Customizable UI**: Full control over fonts, colors, window styles (Blizzard/Flat/Tooltip), and transparency.
+*   **Visual Indicators**: Color-coded status for Player (Green), Target (Teal), Cached (Grey), and Secret/Hidden (Orange) sources.
+
+## 📋 Changelog
+
+### v2.0.0 - Major Update: Architecture Refactor & 12.0 API Support
 
 This update is a complete rewrite to fully support World of Warcraft 11.0+ (The War Within) and upcoming 12.0 API changes, addressing previous API taint issues and parsing errors.
 
@@ -29,9 +41,21 @@ This update is a complete rewrite to fully support World of Warcraft 11.0+ (The 
 
 ---
 
-## 中文 (Chinese)
+# PhaseWatcher (位面监视器)
 
-### 核心变动：架构重构与 12.0 API 适配
+**PhaseWatcher** 是一款专为魔兽世界设计的轻量级插件，用于追踪和显示位面 ID (Phase ID)、区域 UID (ZoneUID) 以及 NPC GUID 信息。它能帮助玩家和开发者确认当前位面状态，确保你与目标处于同一镜像或分层中。
+
+## 🌟 功能特性
+
+*   **位面与 GUID 追踪**：实时监控并显示 NPC 和玩家的位面 ID。
+*   **现代 API 支持**：完美适配 WoW 11.0 (地心之战) 及 12.0+，使用 `MenuUtil` 和原生 `Settings` API，彻底解决 Taint 问题。
+*   **精准解析**：正确解析 GUID 中的十进制 ZoneUID，并严格保护副本中的 "Secret Values" (隐藏 GUID)。
+*   **高度可定制**：完全自定义字体、大小、窗口风格 (暴雪/扁平/提示框) 以及透明度。
+*   **视觉指示**：清晰的颜色编码状态 —— 绿色(玩家)、青色(目标)、灰色(缓存)、橙色(受限/隐藏)。
+
+## 📋 更新日志
+
+### v2.0.0 - 核心变动：架构重构与 12.0 API 适配
 
 本次更新是对插件的全面重写，旨在完美支持魔兽世界 11.0+ (地心之战) 及未来的 12.0 版本，并解决了旧版本存在的 API 污染和解析错误问题。
 

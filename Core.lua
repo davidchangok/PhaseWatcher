@@ -1,6 +1,6 @@
 -----------------------------
 -- PhaseWatcher Core Module
--- Version 2.0
+-- Version 2.0.1
 -----------------------------
 
 local AddonName, PW = ...
@@ -10,8 +10,8 @@ local L = PhaseWatcher_Locale or {}
 PhaseWatcher = PW
 
 -- 版本信息
-PW.Version = "2.0"
-PW.BuildDate = "2025-01-27"
+PW.Version = "2.0.1"
+PW.BuildDate = "2026-02-05"
 
 -----------------------------
 -- 数据库默认值

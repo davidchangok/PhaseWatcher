@@ -4,7 +4,7 @@
 ## Notes-zhCN: 监测并显示当前位面ID
 ## Notes-zhTW: 監測並顯示當前位面ID
 ## Author: David W Zhang
-## Version: 2.0.0
+## Version: 2.0.1
 ## SavedVariables: PhaseWatcherDB
 ## X-Category: Interface Enhancements
 ## X-Website: https://www.curseforge.com/wow/addons/phasewatcher

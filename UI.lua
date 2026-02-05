@@ -1,6 +1,6 @@
 -----------------------------
 -- PhaseWatcher UI Module
--- Version 2.0
+-- Version 2.0.1
 -----------------------------
 
 local AddonName, PW = ...
@@ -278,10 +278,16 @@ end
 
 function PW:SavePosition()
     if not self.mainFrame then return end
-    
-    local point, _, relativePoint, xOfs, yOfs = self.mainFrame:GetPoint()
-    self.db.profile.posX = xOfs
-    self.db.profile.posY = yOfs
+
+    -- 获取框架在屏幕上的绝对位置，然后转换为相对于 UIParent BOTTOMLEFT 的坐标
+    -- 这样可以确保跨角色/分辨率时位置一致
+    local left = self.mainFrame:GetLeft()
+    local top = self.mainFrame:GetTop()
+
+    if left and top then
+        self.db.profile.posX = left
+        self.db.profile.posY = top
+    end
 end
 
 -----------------------------
@@ -433,7 +439,7 @@ local function CreateSettingsPanel()
     -- 版本信息
     local version = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
     version:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -8)
-    version:SetText(L["VERSION"] or "Version 2.0")
+    version:SetText(L["VERSION"] or "Version 2.0.1")
     version:SetTextColor(0.7, 0.7, 0.7, 1)
     
     -- 创建滚动框架

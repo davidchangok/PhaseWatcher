@@ -1,22 +1,35 @@
-# PhaseWatcher
+![Author](https://img.shields.io/badge/Author-David%20W%20Zhang-orange) ![Version](https://img.shields.io/badge/Version-v2.1.0-blue) [![GitHub](https://img.shields.io/badge/GitHub-Repo-181717?logo=github)](https://github.com/davidchangok/PhaseWatcher)
 
-![Author](https://img.shields.io/badge/Author-David%20W%20Zhang-orange) ![Version](https://img.shields.io/badge/Version-v2.0.0-blue) [![GitHub](https://img.shields.io/badge/GitHub-Repo-181717?logo=github)](https://github.com/davidchangok/PhaseWatcher)
+# PhaseWatcher
 
 **PhaseWatcher** is a lightweight World of Warcraft addon designed to track and display Phase IDs, ZoneUIDs, and NPC GUID information. It provides essential phasing data to help players and developers verify if they are in the same shard or layer as their target.
 
 ## 🌟 Features
 
 *   **Phase & GUID Tracking**: Real-time monitoring of NPC and Player Phase IDs.
-*   **Modern API Support**: Built for WoW 11.0 (The War Within) and 12.0+, utilizing `MenuUtil` and the native `Settings` API to eliminate taint.
+*   **Modern API Support**: Built for WoW 11.0+ and 12.0+, utilizing `MenuUtil` and the native `Settings` API to eliminate taint.
 *   **Accurate Parsing**: Correctly interprets decimal ZoneUIDs and handles protected "Secret Values" in instances.
-*   **Customizable UI**: Full control over fonts, colors, window styles (Blizzard/Flat/Tooltip), and transparency.
+*   **Customizable UI**: Full control over font size, transparency, update interval, and window behavior via a modern Settings panel.
 *   **Visual Indicators**: Color-coded status for Player (Green), Target (Teal), Cached (Grey), and Secret/Hidden (Orange) sources.
 
 ## 📋 Changelog
 
+### v2.1.0 - Modernization & Localization Fixes
+
+#### 🐛 Bug Fixes
+*   **Slash command crash**: Fixed `string.trim` → `strtrim` which made all slash commands unusable.
+*   **ZoneUID parsing**: Relaxed upper bound from `999999` to `1e8` to avoid rejecting valid high‑range phase IDs.
+*   **Database migration**: Table‑type defaults (e.g. background color) now merge missing sub‑keys, preventing nil‑alpha issues.
+*   **Right‑click menu localization**: Added dedicated translation keys (`BUTTON_RESET_POSITION`, `BUTTON_CLEAR_CACHE`) for zhCN/zhTW clients.
+
+#### ✨ Improvements
+*   **Modern Settings Panel**: Completely rebuilt using `Settings.RegisterVerticalLayoutCategory` + `Settings.RegisterProxySetting`. All checkboxes and sliders are now native UI elements.
+*   **Slider live labels**: Sliders for update interval, font size, and transparency use `MinimalSliderWithSteppersMixin.Label.Right` for real‑time value display with units.
+*   **Scaled position saving**: Window position is now stored relative to `UIParent` center while compensating for UI scale, keeping the frame stable across resolutions.
+
 ### v2.0.0 - Major Update: Architecture Refactor & 12.0 API Support
 
-This update is a complete rewrite to fully support World of Warcraft 11.0+ (The War Within) and upcoming 12.0 API changes, addressing previous API taint issues and parsing errors.
+This update was a complete rewrite to fully support World of Warcraft 11.0+ (The War Within) and upcoming 12.0 API changes, addressing previous API taint issues and parsing errors.
 
 #### 🌟 Highlights
 *   **Full 11.0+ / 12.0 API Support**:
@@ -48,12 +61,25 @@ This update is a complete rewrite to fully support World of Warcraft 11.0+ (The 
 ## 🌟 功能特性
 
 *   **位面与 GUID 追踪**：实时监控并显示 NPC 和玩家的位面 ID。
-*   **现代 API 支持**：完美适配 WoW 11.0 (地心之战) 及 12.0+，使用 `MenuUtil` 和原生 `Settings` API，彻底解决 Taint 问题。
+*   **现代 API 支持**：完美适配 WoW 11.0+ 和 12.0+，使用 `MenuUtil` 和原生 `Settings` API，彻底解决 Taint 问题。
 *   **精准解析**：正确解析 GUID 中的十进制 ZoneUID，并严格保护副本中的 "Secret Values" (隐藏 GUID)。
-*   **高度可定制**：完全自定义字体、大小、窗口风格 (暴雪/扁平/提示框) 以及透明度。
+*   **高度可定制**：通过现代化的设置面板完全控制字体大小、透明度、更新间隔及窗口行为。
 *   **视觉指示**：清晰的颜色编码状态 —— 绿色(玩家)、青色(目标)、灰色(缓存)、橙色(受限/隐藏)。
 
 ## 📋 更新日志
+
+### v2.1.0 - 现代化与本地化修复
+
+#### 🐛 错误修复
+*   **斜杠命令崩溃**：修复了 `string.trim` 错误（改为 `strtrim`），恢复 `/pw` 命令功能。
+*   **ZoneUID 解析**：放宽上限至 `1e8`，避免丢弃有效的高范围位面 ID。
+*   **数据库迁移**：对表类型默认值（如背景色）进行浅合并，防止缺失 alpha 键导致显示异常。
+*   **右键菜单本地化**：新增专用翻译键 (`BUTTON_RESET_POSITION`、`BUTTON_CLEAR_CACHE`)，修复中文环境下显示英文按钮的问题。
+
+#### ✨ 改进
+*   **现代化设置面板**：使用 `Settings.RegisterVerticalLayoutCategory` + `Settings.RegisterProxySetting` 完全重构，所有复选框和滑块均为原生控件。
+*   **滑块实时标签**：更新间隔、字体大小和透明度滑块通过 `MinimalSliderWithSteppersMixin.Label.Right` 实时显示带单位的数值。
+*   **缩放感知的位置保存**：窗口位置以 UIParent 中心为基准保存，并补偿 UI 缩放，确保跨分辨率稳定。
 
 ### v2.0.0 - 核心变动：架构重构与 12.0 API 适配
 

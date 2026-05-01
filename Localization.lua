@@ -18,7 +18,7 @@ local locale = GetLocale()
 -----------------------------
 L["ADDON_LOADED"] = "loaded - Type %s to open settings"
 L["ADDON_NAME"] = "Phase|cFFFFFFFFWatcher|r"
-L["VERSION"] = "Version 2.0.1 - Fixed a bug in the display position initialization of the multi-role account plugin."
+L["VERSION"] = "Version 2.1.0"
 
 -- UI 文本
 L["PHASE_MONITORING"] = "Phase Monitor"
@@ -112,13 +112,17 @@ L["TOOLTIP_RIGHT_CLICK"] = "Right-click for options"
 L["BUTTON_RESET_POSITION"] = "Reset Window Position"
 L["BUTTON_CLEAR_CACHE"] = "Clear Cached ID"
 
+-- 设置面板按钮文本
+L["RESET_POSITION"] = "Reset Window Position"
+L["CLEAR_CACHE"] = "Clear Cached ID"
+
 -----------------------------
 -- 简体中文 (zhCN)
 -----------------------------
 if locale == "zhCN" then
     L["ADDON_LOADED"] = "已加载 - 输入 %s 打开设置"
     L["ADDON_NAME"] = "位面|cFFFFFFFF监测|r"
-    L["VERSION"] = "版本 2.0.1 - 修复多角色账号显示位置初始化错误"
+    L["VERSION"] = "版本 2.1.0"
 
     -- UI 文本
     L["PHASE_MONITORING"] = "位面监测"
@@ -211,6 +215,10 @@ if locale == "zhCN" then
     -- [新增] 按钮文本
     L["BUTTON_RESET_POSITION"] = "重置窗口位置"
     L["BUTTON_CLEAR_CACHE"] = "清除缓存ID"
+
+    -- 设置面板按钮文本
+    L["RESET_POSITION"] = "重置窗口位置"
+    L["CLEAR_CACHE"] = "清除缓存ID"
 end
 
 -----------------------------
@@ -219,7 +227,7 @@ end
 if locale == "zhTW" then
     L["ADDON_LOADED"] = "已載入 - 輸入 %s 開啟設定"
     L["ADDON_NAME"] = "位面|cFFFFFFFF監測|r"
-    L["VERSION"] = "版本 2.0.1 - 修復多角色帳號顯示位置初始化錯誤"
+    L["VERSION"] = "版本 2.1.0"
 
     -- UI 文本
     L["PHASE_MONITORING"] = "位面監測"
@@ -312,6 +320,10 @@ if locale == "zhTW" then
     -- [新增] 按钮文本
     L["BUTTON_RESET_POSITION"] = "重置視窗位置"
     L["BUTTON_CLEAR_CACHE"] = "清除快取ID"
+
+    -- 设置面板按钮文本
+    L["RESET_POSITION"] = "重置視窗位置"
+    L["CLEAR_CACHE"] = "清除快取ID"
 end
 
 -- 导出本地化表供其他模块使用

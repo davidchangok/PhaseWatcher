@@ -44,6 +44,9 @@ local defaults = {
         -- 更新间隔（秒）
         updateInterval = 0.5,
 
+        -- 调试模式
+        debug = false,
+
         -- 缓存的上一次有效结果，用于无目标时回退显示
         lastPhaseID = nil,
         lastPhaseSource = nil,
@@ -67,14 +70,14 @@ PW.updateTimer = nil      -- C_Timer 定时器对象
 -- 向默认聊天框发送插件消息，自动添加蓝色的 [PhaseWatcher] 前缀
 local function Print(msg, ...)
     if msg then
-        DEFAULT_CHAT_FRAME:AddMessage(string.format("|cFF00BFFF[PhaseWatcher]|r " .. msg, ...))
+        print(string.format("|cFF00BFFF[PhaseWatcher]|r " .. msg, ...))
     end
 end
 PW.Print = Print
 
--- 调试输出，仅在 PW.debug 开启时生效
+-- 调试输出，仅在 PW.db.profile.debug 开启时生效
 local function DebugPrint(msg, ...)
-    if PW.debug then
+    if PW.db and PW.db.profile and PW.db.profile.debug then
         Print("|cFFFF6B6B[DEBUG]|r " .. msg, ...)
     end
 end
@@ -181,11 +184,11 @@ local function GetPhaseFromUnit(unit)
         end
     end
 
-    -- 辅助方法：检查位面差异原因（仅在非同一位面时返回非 nil，但不提供具体 ID）
+    -- 辅助方法：检查位面差异原因（仅在非同一位面时返回 PhaseReason 枚举值）
     if C_PhaseInfo and C_PhaseInfo.GetPhaseReason then
         local phaseReason = C_PhaseInfo.GetPhaseReason(unit)
-        if phaseReason then
-            DebugPrint("Phase reason for %s: %s", unit, tostring(phaseReason))
+        if phaseReason and type(phaseReason) == "number" then
+            DebugPrint("Phase reason for %s: %d", unit, phaseReason)
         end
     end
 
@@ -273,8 +276,11 @@ local function StartUpdateTimer()
 
     local interval = PW.db.profile.updateInterval or 0.5
     PW.updateTimer = C_Timer.NewTicker(interval, function()
-        UpdatePhaseID()
-        PW.lastUpdateTime = GetTime()  -- 记录更新时间戳
+        local ok, err = pcall(UpdatePhaseID)
+        if not ok then
+            DebugPrint("Update error: %s", tostring(err))
+        end
+        PW.lastUpdateTime = GetTime()
     end)
 end
 PW.StartUpdateTimer = StartUpdateTimer
@@ -453,8 +459,8 @@ local function HandleSlashCommand(msg)
         end
     elseif msg == "debug" then
         -- 开启/关闭调试模式，开启后额外输出调试信息
-        PW.debug = not PW.debug
-        Print("Debug mode: %s", PW.debug and "ON" or "OFF")
+        PW.db.profile.debug = not PW.db.profile.debug
+        Print("Debug mode: %s", PW.db.profile.debug and "ON" or "OFF")
     else
         -- 未知或无效命令，显示帮助信息
         Print(L["COMMANDS_TITLE"] or "Commands:")

@@ -14,18 +14,25 @@
 
 ## 📋 Changelog
 
-### v2.1.0 - Modernization & Localization Fixes
+### v2.1.0 - Modernization & Code Quality Improvements
 
 #### 🐛 Bug Fixes
 *   **Slash command crash**: Fixed `string.trim` → `strtrim` which made all slash commands unusable.
 *   **ZoneUID parsing**: Relaxed upper bound from `999999` to `1e8` to avoid rejecting valid high‑range phase IDs.
 *   **Database migration**: Table‑type defaults (e.g. background color) now merge missing sub‑keys, preventing nil‑alpha issues.
 *   **Right‑click menu localization**: Added dedicated translation keys (`BUTTON_RESET_POSITION`, `BUTTON_CLEAR_CACHE`) for zhCN/zhTW clients.
+*   **Settings panel button localization**: Added missing `RESET_POSITION` and `CLEAR_CACHE` translation keys for all three languages — the settings panel buttons previously fell back to English text in zhCN/zhTW clients.
+*   **Version string consistency**: Updated stale `VERSION` localization strings (all three languages) from 2.0.1 to 2.1.0, matching the TOC and runtime version.
+*   **ChatFontNormal nil safety**: Added a nil‑guard fallback (`STANDARD_TEXT_FONT`) when reading the chat font path, preventing a crash if `ChatFontNormal` is hidden or removed by another addon.
+*   **Ticker error resilience**: Wrapped `UpdatePhaseID()` with `pcall` inside the `C_Timer.NewTicker` callback so a transient error no longer silently kills the refresh loop.
+*   **GetPhaseReason type validation**: Only log a debug message when `C_PhaseInfo.GetPhaseReason` returns a numeric value, avoiding meaningless `table: 0x…` output.
 
 #### ✨ Improvements
-*   **Modern Settings Panel**: Completely rebuilt using `Settings.RegisterVerticalLayoutCategory` + `Settings.RegisterProxySetting`. All checkboxes and sliders are now native UI elements.
-*   **Slider live labels**: Sliders for update interval, font size, and transparency use `MinimalSliderWithSteppersMixin.Label.Right` for real‑time value display with units.
-*   **Scaled position saving**: Window position is now stored relative to `UIParent` center while compensating for UI scale, keeping the frame stable across resolutions.
+*   **Modern Settings Panel**: Registered via `Settings.RegisterCanvasLayoutCategory` + `Settings.RegisterAddOnCategory` for full 11.0+ compatibility, with legacy `InterfaceOptions_AddCategory` fallback.
+*   **Slider live labels**: Custom FontString labels above each slider show real‑time numeric values during drag.
+*   **Scaled position saving**: Window position is stored as an offset from `UIParent` center, keeping the frame stable across resolutions.
+*   **Chat output**: Replaced legacy `DEFAULT_CHAT_FRAME:AddMessage` with `print()` for more reliable message delivery.
+*   **Debug mode persistence**: Moved `debug` flag into `SavedVariables` (`PhaseWatcherDB`) so the toggle survives UI reloads / relogs.
 
 ### v2.0.0 - Major Update: Architecture Refactor & 12.0 API Support
 
@@ -68,18 +75,25 @@ This update was a complete rewrite to fully support World of Warcraft 11.0+ (The
 
 ## 📋 更新日志
 
-### v2.1.0 - 现代化与本地化修复
+### v2.1.0 - 现代化与代码质量提升
 
 #### 🐛 错误修复
 *   **斜杠命令崩溃**：修复了 `string.trim` 错误（改为 `strtrim`），恢复 `/pw` 命令功能。
 *   **ZoneUID 解析**：放宽上限至 `1e8`，避免丢弃有效的高范围位面 ID。
 *   **数据库迁移**：对表类型默认值（如背景色）进行浅合并，防止缺失 alpha 键导致显示异常。
-*   **右键菜单本地化**：新增专用翻译键 (`BUTTON_RESET_POSITION`、`BUTTON_CLEAR_CACHE`)，修复中文环境下显示英文按钮的问题。
+*   **右键菜单本地化**：新增专用翻译键 (`BUTTON_RESET_POSITION`、`BUTTON_CLEAR_CACHE`)，修复中文环境下右键菜单显示英文按钮的问题。
+*   **设置面板按钮本地化**：补充 `RESET_POSITION` 和 `CLEAR_CACHE` 三种语言翻译键 —— 设置面板中的"重置位置"和"清除缓存"按钮此前在 zhCN/zhTW 客户端下始终显示英文。
+*   **版本号一致性**：同步三种语言的 `VERSION` 本地化字符串，从 2.0.1 更新至 2.1.0，与 TOC 文件和运行时版本号保持一致。
+*   **ChatFontNormal 空值安全**：为聊天字体路径读取添加 nil 检测与回退 (`STANDARD_TEXT_FONT`)，防止其他插件隐藏 `ChatFontNormal` 时引发崩溃。
+*   **定时器容错**：在 `C_Timer.NewTicker` 回调中使用 `pcall` 包裹 `UpdatePhaseID()`，避免瞬态错误静默终止刷新循环。
+*   **GetPhaseReason 类型校验**：仅当 `C_PhaseInfo.GetPhaseReason` 返回数值类型时才输出调试信息，避免无意义的 `table: 0x…` 日志。
 
 #### ✨ 改进
-*   **现代化设置面板**：使用 `Settings.RegisterVerticalLayoutCategory` + `Settings.RegisterProxySetting` 完全重构，所有复选框和滑块均为原生控件。
-*   **滑块实时标签**：更新间隔、字体大小和透明度滑块通过 `MinimalSliderWithSteppersMixin.Label.Right` 实时显示带单位的数值。
-*   **缩放感知的位置保存**：窗口位置以 UIParent 中心为基准保存，并补偿 UI 缩放，确保跨分辨率稳定。
+*   **现代化设置面板**：通过 `Settings.RegisterCanvasLayoutCategory` + `Settings.RegisterAddOnCategory` 注册，完整兼容 11.0+，并保留 `InterfaceOptions_AddCategory` 旧版回退。
+*   **滑块实时标签**：在每个滑块上方使用自定义 FontString 标签实时显示当前数值。
+*   **缩放感知的位置保存**：窗口位置以 UIParent 中心为基准计算偏移量存储，跨分辨率保持稳定。
+*   **聊天输出**：将过时的 `DEFAULT_CHAT_FRAME:AddMessage` 替换为 `print()`，消息投递更加可靠。
+*   **调试模式持久化**：将 `debug` 标志纳入 `SavedVariables` (`PhaseWatcherDB`)，调试开关在重载/重登后保持状态。
 
 ### v2.0.0 - 核心变动：架构重构与 12.0 API 适配
 

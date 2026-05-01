@@ -462,7 +462,7 @@ local function CreateSettingsPanel()
     -- 版本信息
     local version = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
     version:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -8)
-    version:SetText(L["VERSION"] or "Version 2.0.1")
+    version:SetText(L["VERSION"] or "Version 2.1.0")
     version:SetTextColor(0.7, 0.7, 0.7, 1)
 
     -- 滚动框架（容纳较多设置项）
@@ -632,7 +632,7 @@ local function CreateSettingsPanel()
 
     local fonts = {
         {name = L["FONT_SYSTEM"] or "System Default", path = STANDARD_TEXT_FONT},
-        {name = L["FONT_CHAT"] or "Chat Font", path = ChatFontNormal:GetFont()},
+        {name = L["FONT_CHAT"] or "Chat Font", path = (ChatFontNormal and ChatFontNormal:GetFont()) or STANDARD_TEXT_FONT},
         {name = L["FONT_DAMAGE"] or "Combat Text", path = DAMAGE_TEXT_FONT},
     }
 
